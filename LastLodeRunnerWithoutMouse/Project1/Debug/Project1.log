@@ -1,0 +1,6 @@
+﻿  FirstMap.cpp
+d:\дз\loderunner\loderunner2\loderunner\project1\firstmap.cpp(37): warning C4244: '=': conversion from 'wint_t' to 'char', possible loss of data
+d:\дз\loderunner\loderunner2\loderunner\project1\firstmap.cpp(72): warning C4244: '=': conversion from 'wint_t' to 'char', possible loss of data
+d:\дз\loderunner\loderunner2\loderunner\project1\firstmap.cpp(18): warning C4101: 'c': unreferenced local variable
+d:\дз\loderunner\loderunner2\loderunner\project1\firstmap.cpp(154): warning C4244: '=': conversion from 'wint_t' to 'char', possible loss of data
+  Project1.vcxproj -> D:\ДЗ\LodeRunner\LodeRunner2\LodeRunner\Debug\LodeRunner.exe
