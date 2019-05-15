@@ -5,7 +5,9 @@
 
 void main()
 {
+
 	ShowConsole();
 	PlayGame();
 	system("pause >> NUL");
 }
+	

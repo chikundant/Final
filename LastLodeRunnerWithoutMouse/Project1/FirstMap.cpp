@@ -16,7 +16,7 @@ const string MAP3 = "DefaultMaps/Map3";
 
 void PlayGame()
 {
-	//CreateThread(0, 0, MainMusic, 0, 0, 0);
+
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	string FirstmMenuItems[ITEMS_COUNT] = { "PLAY","CREATE MAP","LOAD MAP","EXIT" };
 
@@ -42,6 +42,10 @@ void PlayGame()
 	int code;
 	while (true)
 	{
+		if (!CreateThread(0, 0, MainMusic, 0, 0, 0))
+		{
+			CreateThread(0, 0, MainMusic, 0, 0, 0);
+		}
 		code = _getch();
 		if (code == 224)
 			code = _getch();
@@ -52,14 +56,17 @@ void PlayGame()
 
 		if ((code == DOWN || code == RIGHT) && currentItem < ITEMS_COUNT - 1) // down arrow
 		{
+			Beep(640, 10);
 			currentItem++;
 		}
 		else if ((code == UP || code == LEFT) && currentItem > 0) // up arrow
 		{
+			Beep(640, 10);
 			currentItem--;
 		}
 		else if (code == ENTER)
 		{
+			Beep(1000, 20);
 			switch (currentItem)
 			{
 			case 0:
@@ -76,6 +83,7 @@ void PlayGame()
 				}
 				break;
 			case 1:
+
 				Create();
 				startX = MENU_INDENT;
 				startY = INDENT_TOP + 1;
@@ -121,9 +129,9 @@ void CreateMap()
 	MapCreator(prize, COUNT_OF_PRIZE, 1, 1, PRIZE, 1);
 }
 
-//Graphics
 void DrawBorder()
 {
+	GotoXY(0, 0);
 	for (int i = 0; i < HEIGHT + INDENT_TOP; i++)
 	{
 		if (i >= INDENT_TOP)
@@ -153,6 +161,7 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 		// left
 		if (*input == 75 && tmpX > INDENT_SIDE + 2) 
 		{
+			Beep(540, 5);
 			if (FloorCollision(width, height, tmpX - 1, tmpY) && RopeCollision(width, height, tmpX - 1, tmpY) && LaderCollision(width, height, tmpX - 1, tmpY))
 			{
 				tripleChangePosition(sprite, FULL_SIZE_BLOCK, ROPE, LADER, width, height, &tmpX, &tmpY, -1, 0);
@@ -169,17 +178,17 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 			{
 				ChangePos(countSign, FULL_SIZE_BLOCK, sprite, &tmpX, &tmpY, width, height, -1, 0);
 			}
-			else if (LaderCollision(width, height, tmpX - 1, tmpY ))
+			else if (LaderCollision(width, height, tmpX - 1, tmpY - LADER_WIDTH) && sprite == PRIZE)
+			{
+				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, -1, 0);
+			}
+			else if (LaderCollision(width, height, tmpX - 1, tmpY ) && sprite != PRIZE)
 			{
 				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, -1, 0);
 			}
 			else if (RopeCollision(width, height, tmpX - 1, tmpY))
 			{
 				ChangePos(countSign, ROPE, sprite, &tmpX, &tmpY, width, height, -1, 0);
-			}
-			else if (LaderCollision(width, height, tmpX - 1, tmpY - LADER_WIDTH) && sprite == PRIZE)
-			{
-				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, -1, 0);
 			}
 			else if (PrizeCollision(width, height, tmpX - 1, tmpY))
 			{
@@ -190,6 +199,7 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 		// rigth
 		else if (*input == 77 && tmpX + width < WIDTH - 1)
 		{
+			Beep(540, 5);
 			if (FloorCollision(width, height, tmpX - width, tmpY) && RopeCollision(width, height, tmpX - width, tmpY)&& LaderCollision(width, height, tmpX - width, tmpY))
 			{
 				tripleChangePosition(sprite, FULL_SIZE_BLOCK, ROPE, LADER, width, height, &tmpX, &tmpY, 1, 0);
@@ -206,17 +216,17 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 			{
 				ChangePos(countSign, FULL_SIZE_BLOCK, sprite, &tmpX, &tmpY, width, height, 1, 0);
 			}
-			else if (LaderCollision(width, height, tmpX - width, tmpY))
+			else if (LaderCollision(width, height, tmpX - 1, tmpY - LADER_WIDTH ) && sprite == PRIZE)
+			{
+				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, 1, 0);
+			}
+			else if (LaderCollision(width, height, tmpX - width, tmpY) && sprite != PRIZE)
 			{
 				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, 1, 0);
 			}
 			else if (RopeCollision(width, height, tmpX - width, tmpY))
 			{
 				ChangePos(countSign, ROPE, sprite, &tmpX, &tmpY, width, height, 1, 0);
-			}
-			else if (LaderCollision(width, height, tmpX - 1, tmpY - LADER_WIDTH)&& sprite == PRIZE)
-			{
-				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, 1, 0);
 			}
 			else if (PrizeCollision(width, height, tmpX - width, tmpY))
 			{
@@ -227,6 +237,7 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 		// up
 		else if (*input == 72 && tmpY > INDENT_TOP + 6 )
 		{
+			Beep(680, 5);
 			if (FloorCollision(width, height, tmpX - width, tmpY) && RopeCollision(width, height, tmpX - width, tmpY) && LaderCollision(width, height, tmpX - width, tmpY))
 			{
 				tripleChangePosition(sprite, FULL_SIZE_BLOCK, ROPE, LADER, width, height, &tmpX, &tmpY, 0, -6);
@@ -243,7 +254,11 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 			{
 				ChangePos(countSign, FULL_SIZE_BLOCK, sprite, &tmpX, &tmpY, width, height, 0, -6);
 			}
-			else if (LaderCollision(width, height, tmpX - width, tmpY))
+			else if (LaderCollision(width, height, tmpX - width, tmpY - LADER_WIDTH - 1) && sprite == PRIZE)
+			{
+				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, 0, -6);
+			}
+			else if (LaderCollision(width, height, tmpX - width, tmpY) && sprite != PRIZE)
 			{
 				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, 0, -6);
 			}
@@ -260,6 +275,7 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 		// down
 		else if ((*input == 80 && tmpY < HEIGHT - 3 && sprite != ROPE) || (*input == 80 && tmpY < HEIGHT - 4 && sprite == ROPE) )
 		{
+			Beep(680, 5);
 			if (FloorCollision(width, height, tmpX - width, tmpY) && RopeCollision(width, height, tmpX - width, tmpY) && LaderCollision(width, height, tmpX - width, tmpY))
 			{
 				tripleChangePosition(sprite, FULL_SIZE_BLOCK, ROPE, LADER ,width, height, &tmpX, &tmpY, 0, 6);
@@ -276,7 +292,11 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 			{
 				ChangePos(countSign, FULL_SIZE_BLOCK, sprite, &tmpX, &tmpY, width, height, 0, 6);
 			}
-			else if (LaderCollision(width, height, tmpX - width, tmpY))
+			else if (LaderCollision(width, height, tmpX - width, tmpY - LADER_WIDTH) && sprite == PRIZE)
+			{
+				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, 0, 6);
+			}
+			else if (LaderCollision(width, height, tmpX - width, tmpY) && sprite != PRIZE)
 			{
 				ChangePos(countSign, LADER, sprite, &tmpX, &tmpY, width, height, 0, 6);
 			}
@@ -294,6 +314,7 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 		// Enter
 		else if (*input == 13 )
 		{
+			Beep(940, 5);
 			if (LaderCollision(width, height, tmpX - 1, tmpY - LADER_WIDTH) && sprite == PRIZE);
 			//left move
 			else if (
@@ -887,8 +908,6 @@ bool EnemyCollision() // left collision
 }
 */
 
-//Work with files
-
 void WriteToFile(string name) 
 {
 	ofstream Out;
@@ -1026,6 +1045,21 @@ void DeleteArray()
 		enemy[i].x = 0;
 		enemy[i].y = 0;
 	}
+	for (int i = 0; i < COUNT_OF_ENEMY; i++)
+	{
+		//SetColor(Red, White);
+		enemy[i].look.frontLook = "";
+
+		enemy[i].look.leftLook = "";
+
+		enemy[i].look.rightLook = "";
+
+		enemy[i].look.width = 2;
+
+		enemy[i].x = 0;
+		enemy[i].y = 0;
+	}
+
 }
 
 void EnemyMove(Sprites hero, char *enemyPosition, char *heroPosition)
@@ -1372,6 +1406,7 @@ void Move()
 	GotoXY(hero.x, hero.y);
 	cout << hero.look.rightLook;
 	*position = 'r';
+	
 	for (; !*win;)
 	{
 		for (int i = 0; i < COUNT_OF_ENEMY; i++)
@@ -1379,10 +1414,16 @@ void Move()
 			if (enemy[i].x == hero.x && enemy[i].y == hero.y)
 			{
 				Sleep(200);
-				CreateThread(0, 0, Lose, 0, 0, 0);
+				mciSendString("Play sound/Lose.wav", 0, 0, 0);
 				//DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
 				GotoXY(0, 0);
 				DrawBorder();
+				delete input, win, position, prizeOnMap, enemyPosition, skipCount;
+				prizeOnMap = nullptr;
+				win = nullptr;
+				input = nullptr;
+				position = nullptr;
+				skipCount = nullptr;
 				return;
 			}
 		}
@@ -1394,15 +1435,17 @@ void Move()
 				GotoXY(WIDTH + *countPrize + 2, INDENT_TOP + 2);
 				cout << PRIZE;
 				*countPrize += 1;
-				CreateThread(0, 0, TakePrize, 0, 0, 0); // If prize is taken play sound
+				mciSendString("Play sound/TakePrize.wav", 0, 0, 0); // If prize is taken play sound
 				if (*countPrize == *prizeOnMap)
 				{
 					for (int i = 0; i < 5; i++)
 					{
 						for (int j = 0; j <	 2; j++)
 						{
+							mciSendString("Play sound/OpenTheDoor.wav", 0, 0, 0);
 							GotoXY(WIDTH - 1 + j, HEIGHT - 2 + i);
-							cout << " ";
+							SetColor(Red, White);
+							cout << FULL_SIZE_BLOCK;
 						}
 					}
 				}
@@ -1410,6 +1453,7 @@ void Move()
 			// left
 			if (*input == 75 && hero.x > INDENT_SIDE + 2)
 			{
+
 				*position = 'l';
 				if (LaderCollision(hero.look.width, 1, hero.x - hero.look.width + 1, hero.y - LADER_HEIGHT + 1))
 				{
@@ -1425,6 +1469,7 @@ void Move()
 			// if won
 			else if ((*input == 77 && *countPrize == *prizeOnMap) && hero.x + hero.look.width == WIDTH - 1 && hero.y > INDENT_TOP + HEIGHT - 5)
 			{
+				
 				*position = 'r';
 				if (LaderCollision(hero.look.width, 1, hero.x - hero.look.width, hero.y - LADER_HEIGHT + 1))
 				{
@@ -1436,12 +1481,20 @@ void Move()
 					else ChangePos(hero.look.rightLook, LADER, &hero.x, &hero.y, hero.look.width, 1, 0);
 				}
 				else ChangePos(hero.look.rightLook, &hero.x, &hero.y, hero.look.width, 1, 0);
+				mciSendString("Play sound/Win.wav", 0, 0, 0);
+				delete input, win, position, prizeOnMap, enemyPosition, skipCount;
+				prizeOnMap = nullptr;
+				win = nullptr;
+				input = nullptr;
+				position = nullptr;
+				skipCount = nullptr;
 				return;
 
 			}
 			// right
 			else if (*input == 77 && hero.x + hero.look.width < WIDTH - 1)
 			{
+				
 				*position = 'r';
 				if (LaderCollision(hero.look.width, 1, hero.x - hero.look.width, hero.y - LADER_HEIGHT + 1))
 				{
@@ -1459,6 +1512,7 @@ void Move()
 			// up
 			else if (*input == 72 && hero.y > INDENT_TOP + 5)
 			{
+				
 				if (LaderCollision(hero.look.width, 1, hero.x - hero.look.width, hero.y - LADER_HEIGHT + 1))
 				{
 					if (*position == 'l') {
@@ -1542,6 +1596,7 @@ void Move()
 
 			}
 		Fall:
+			//int wav = 10000;
 			while (((!FloorCollision(hero.look.width, 1, hero.x - hero.look.width, hero.y + 1) && *position == 'r') || ((!FloorCollision(hero.look.width, 1, hero.x - 1, hero.y + 1) && *position == 'l'))) && hero.y < HEIGHT + INDENT_TOP - 2)
 			{
 				if (((PrizeCollision(hero.x, hero.y) || PrizeCollision(hero.x + 1, hero.y)) && *position == 'r') || (PrizeCollision(hero.x, hero.y) || PrizeCollision(hero.x - 1, hero.y)) && *position == 'l')
@@ -1582,14 +1637,17 @@ void Move()
 				}
 				else if (*position == 'l')
 				{
+					//Beep(wav, 2);
 					Sleep(50);
 					ChangePos(hero.look.leftLook, &hero.x, &hero.y, hero.look.width, 0, 1);
 				}
 				else if (*position == 'r')
 				{
+					//Beep(wav, 2);
 					Sleep(50);
 					ChangePos(hero.look.rightLook, &hero.x, &hero.y, hero.look.width, 0, 1);
 				}
+				//wav -= 300;
 			}
 		}
 		else {
@@ -1602,13 +1660,6 @@ void Move()
 			else *skipCount += 1;
 		}
 	}
-	//SetColor(Black, White);
-	delete input, win, position, prizeOnMap, enemyPosition, skipCount;
-	prizeOnMap = nullptr;
-	win = nullptr;
-	input = nullptr;
-	position = nullptr;
-	skipCount = nullptr;
 }
 
 void PrizeCount(int *count)
@@ -1617,7 +1668,7 @@ void PrizeCount(int *count)
 	{
 		if (prize[i].x != 0 )
 		{
-			*count+=1;
+			*count += 1;
 		}
 	}
 }
@@ -1633,6 +1684,7 @@ void Create()
 	DeleteArray();
 	DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
 	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+	//DrawBorder();
 	GotoXY(MENU_INDENT, INDENT_TOP + 1);
 	cout << "Write map name" << endl;
 	ShowCursor(true);
@@ -1643,6 +1695,7 @@ void Create()
 	GotoXY(INDENT_SIDE / 2 + WIDTH / 2, INDENT_TOP / 2);
 	cout << *name;
 	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+	DrawBorder();
 	CreateMap();
 	WriteToFile(*name);
 	delete name;
@@ -1688,18 +1741,22 @@ void Load()
 
 		if ((code == DOWN || code == RIGHT) && currentItem < ITEMS_COUNT - 1) // down arrow
 		{
+			Beep(640, 10);
 			currentItem++;
 		}
 		else if ((code == UP || code == LEFT) && currentItem > 0) // up arrow
 		{
+			Beep(640, 10);
 			currentItem--;
 		}
 		else if (code == ENTER)
 		{
+			Beep(1000, 20);
 			if (currentItem == 0)
 			{
 				DeleteArray();
 				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+				DrawBorder();
 				LoadFromFile(MAP1);
 				DrawMap(block, rope, lader, prize);
 				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
@@ -1709,6 +1766,7 @@ void Load()
 			{
 				DeleteArray();
 				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+				DrawBorder();
 				LoadFromFile(MAP2);
 				DrawMap(block, rope, lader, prize);
 				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
@@ -1718,6 +1776,7 @@ void Load()
 			{
 				DeleteArray();
 				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+				DrawBorder();
 				LoadFromFile(MAP3);
 				DrawMap(block, rope, lader, prize);
 				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
@@ -1735,6 +1794,7 @@ void Load()
 				*str += *tmpStr;
 				LoadFromFile(*str);
 				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+				DrawBorder();
 				DrawMap(block, rope, lader, prize);
 				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
 				break;
@@ -1746,3 +1806,4 @@ void Load()
 		cout << SecondMenuItem[currentItem];
 	}
 }
+
