@@ -41,8 +41,8 @@ bool RopeCollision(int, int, int, int);
 bool LaderCollision(int, int, int, int);
 bool PrizeCollision(int, int, int, int);
 bool PrizeCollision(int, int); // width delete
-//bool EnemyCollision();
-//bool EnemyCollision(char);
+bool EnemyCollision();
+bool EnemyCollision(char);
 void DrawSpace(int,int,int,int);
 void DrawMap(Sprites[], Sprites[], Sprites[], Sprites[]);
 void DeleteArray();

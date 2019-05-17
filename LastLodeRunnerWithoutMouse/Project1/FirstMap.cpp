@@ -10,15 +10,25 @@ Sprites lader[COUNT_OF_LADERS];
 Sprites prize[COUNT_OF_PRIZE];
 Sprites enemy[COUNT_OF_ENEMY];
 
-const string MAP1 = "DefaultMaps/Map1";
-const string MAP2 = "DefaultMaps/Map2";
-const string MAP3 = "DefaultMaps/Map3";
+bool MapUpload = false;
+ string MAP1 = "DefaultMaps/Map1";
+ string MAP2 = "DefaultMaps/Map2";
+ string MAP3 = "DefaultMaps/Map3";
+ string MAP_HELP1 = "DefaultMaps/Map1";
+ string MAP_HELP2 = "DefaultMaps/Map2";
+ string MAP_HELP3 = "DefaultMaps/Map3";
 
 void PlayGame()
 {
-
+	GotoXY(WIDTH / 2, INDENT_TOP / 2);
+	SetColor(Black, White);
+	cout << "Upload map and press ";
+	SetColor(White, Black);
+	cout << "SPACE";
+	SetColor(Black, White);
+	cout << " to start";
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-	string FirstmMenuItems[ITEMS_COUNT] = { "PLAY","CREATE MAP","LOAD MAP","EXIT" };
+	string FirstmMenuItems[ITEMS_COUNT] = { "NEW GAME","CREATE MAP","LOAD MAP","EXIT" };
 
 	int startX = MENU_INDENT;
 	int startY = INDENT_TOP + 1;
@@ -53,8 +63,11 @@ void PlayGame()
 		position.Y = startY + currentItem * margin;
 		SetConsoleCursorPosition(h, position);
 		cout << FirstmMenuItems[currentItem];
-
-		if ((code == DOWN || code == RIGHT) && currentItem < ITEMS_COUNT - 1) // down arrow
+		if (code == SPACE && MapUpload == true)
+		{
+			Move();
+		}
+		else if ((code == DOWN || code == RIGHT) && currentItem < ITEMS_COUNT - 1) // down arrow
 		{
 			Beep(640, 10);
 			currentItem++;
@@ -111,7 +124,6 @@ void PlayGame()
 				break;
 			case 3:
 				exit(0);
-				break;
 			}
 		}
 		SetColor(White, Black);
@@ -127,6 +139,7 @@ void CreateMap()
 	MapCreator(rope, COUNT_OF_ROPES, ROPE_WIDTH, 1, ROPE, 2);
 	MapCreator(lader, COUNT_OF_LADERS, LADER_WIDTH, LADER_HEIGHT, LADER, 0);
 	MapCreator(prize, COUNT_OF_PRIZE, 1, 1, PRIZE, 1);
+	MapUpload = true;
 }
 
 void DrawBorder()
@@ -136,7 +149,7 @@ void DrawBorder()
 	{
 		if (i >= INDENT_TOP)
 		{
-			for (int j = 0; j < WIDTH + INDENT_SIDE; j++)
+			for (int j = 0; j < WIDTH + 1; j++)
 			{
 				if (j < WIDTH && j > INDENT_SIDE && (i == INDENT_TOP || i == HEIGHT + INDENT_TOP - 1)) cout << FULL_SIZE_BLOCK;
 				else if (j == INDENT_SIDE || j == WIDTH || j == INDENT_SIDE + 1 || j == WIDTH - 1) cout << FULL_SIZE_BLOCK;
@@ -912,7 +925,7 @@ void WriteToFile(string name)
 {
 	ofstream Out;
 	fs::create_directories("Maps/UserMaps");
-	Out.open("Maps/UserMaps/" + name + ".txt");
+	Out.open("Maps/UserMaps/" + name + ".bin");
 	if (!Out.is_open())
 	{
 		cout << "ERROR!";
@@ -955,10 +968,11 @@ void WriteToFile(string name)
 void LoadFromFile(string name)
 {
 	ifstream Out;
-	Out.open("Maps/" + name + ".txt");
+	Out.open("Maps/" + name + ".bin");
 	if (!Out.is_open())
 	{
 		cout << endl << "\t  ERROR";
+		MapUpload = false;
 		Sleep(500);
 	}
 	else 
@@ -992,6 +1006,7 @@ void LoadFromFile(string name)
 				}
 			}
 		}
+		MapUpload = true;
 	}
 	Out.close();
 }
@@ -1365,6 +1380,8 @@ void Move()
 	enemy[1].y = INDENT_TOP + 4;
 	enemy[2].x = INDENT_SIDE + 50;
 	enemy[2].y = INDENT_TOP + 14;
+	enemy[3].x = INDENT_SIDE + 80;
+	enemy[3].y = INDENT_TOP + 21;
 
 	for (int i = 0; i < COUNT_OF_ENEMY; i++)
 	{
@@ -1417,7 +1434,24 @@ void Move()
 				mciSendString("Play sound/Lose.wav", 0, 0, 0);
 				//DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
 				GotoXY(0, 0);
-				DrawBorder();
+				//DrawBorder();
+				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+				for (int i = 0; i < 5; i++)
+				{
+					for (int j = 0; j < 2; j++)
+					{
+						GotoXY(WIDTH - 1 + j, HEIGHT - 2 + i);
+						SetColor(Black, White);
+						cout << FULL_SIZE_BLOCK;
+						MapUpload = false;
+					}
+				}
+				for (int i = 0; i < COUNT_OF_PRIZE; i++)
+				{
+					GotoXY(WIDTH + i + 1, INDENT_TOP + 2);
+					cout << " ";
+				}
+				MapUpload = false;
 				delete input, win, position, prizeOnMap, enemyPosition, skipCount;
 				prizeOnMap = nullptr;
 				win = nullptr;
@@ -1446,11 +1480,17 @@ void Move()
 							GotoXY(WIDTH - 1 + j, HEIGHT - 2 + i);
 							SetColor(Red, White);
 							cout << FULL_SIZE_BLOCK;
+							MapUpload = false;
 						}
 					}
 				}
 			}
 			// left
+			if (*input == ESCAPE)
+			{
+				MapUpload = false;
+				break;
+			}
 			if (*input == 75 && hero.x > INDENT_SIDE + 2)
 			{
 
@@ -1675,38 +1715,10 @@ void PrizeCount(int *count)
 
 void Play()
 {
-	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
-	Move();
-}
 
-void Create()
-{
-	DeleteArray();
-	DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
-	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
-	//DrawBorder();
-	GotoXY(MENU_INDENT, INDENT_TOP + 1);
-	cout << "Write map name" << endl;
-	ShowCursor(true);
-	string *name = new string;
-	GotoXY(MENU_INDENT, INDENT_TOP + 2);
-	cin >> *name;
-	ShowCursor(false);
-	GotoXY(INDENT_SIDE / 2 + WIDTH / 2, INDENT_TOP / 2);
-	cout << *name;
-	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
-	DrawBorder();
-	CreateMap();
-	WriteToFile(*name);
-	delete name;
-	
-}
-
-void Load()
-{
 	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	string SecondMenuItem[ITEMS_COUNT] = { "MAP1","MAP2","MAP3","USER MAP" };
+	string SecondMenuItem[ITEMS_COUNT - 1] = { "MAP1","MAP2","MAP3" };
 
 	int startX = MENU_INDENT;
 	int startY = INDENT_TOP + 1;
@@ -1731,6 +1743,7 @@ void Load()
 	int code;
 	while (true)
 	{
+		int tmp = 0;
 		code = _getch();
 		if (code == 224)
 			code = _getch();
@@ -1738,8 +1751,16 @@ void Load()
 		position.Y = startY + currentItem * margin;
 		SetConsoleCursorPosition(h, position);
 		cout << SecondMenuItem[currentItem];
-
-		if ((code == DOWN || code == RIGHT) && currentItem < ITEMS_COUNT - 1) // down arrow
+		if (code == SPACE && MapUpload == true)
+		{
+			Move();
+			break;
+		}
+		else if (code == ESCAPE)
+		{
+			break;
+		}
+		else if ((code == DOWN || code == RIGHT) && currentItem < ITEMS_COUNT - 2) // down arrow
 		{
 			Beep(640, 10);
 			currentItem++;
@@ -1754,50 +1775,84 @@ void Load()
 			Beep(1000, 20);
 			if (currentItem == 0)
 			{
+				MapUpload = true;
 				DeleteArray();
 				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
-				DrawBorder();
-				LoadFromFile(MAP1);
+				//DrawBorder();
+				LoadFromFile(MAP_HELP1);
 				DrawMap(block, rope, lader, prize);
-				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
-				break;
+				for (int i = 0; i < 5; i++)
+				{
+					for (int j = 0; j < 2; j++)
+					{
+						GotoXY(WIDTH - 1 + j, HEIGHT - 2 + i);
+						SetColor(Black, White);
+						cout << FULL_SIZE_BLOCK;
+					}
+				}
+				for (int i = 0; i < COUNT_OF_PRIZE; i++)
+				{
+					GotoXY(WIDTH + i + 1, INDENT_TOP + 2);
+					cout << " ";
+				}
+				GotoXY(INDENT_SIDE / 2 + WIDTH / 2, INDENT_TOP + HEIGHT + 1);
+				cout << "MAP1                  ";
+				//DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+				//break;
 			}
 			else if (currentItem == 1)
 			{
+				MapUpload = true;
 				DeleteArray();
 				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
-				DrawBorder();
-				LoadFromFile(MAP2);
+				//DrawBorder();
+				LoadFromFile(MAP_HELP2);
 				DrawMap(block, rope, lader, prize);
-				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
-				break;
+				for (int i = 0; i < 5; i++)
+				{
+					for (int j = 0; j < 2; j++)
+					{
+						GotoXY(WIDTH - 1 + j, HEIGHT - 2 + i);
+						SetColor(Black, White);
+						cout << FULL_SIZE_BLOCK;
+					}
+				}
+				for (int i = 0; i < COUNT_OF_PRIZE; i++)
+				{
+					GotoXY(WIDTH + i + 1, INDENT_TOP + 2);
+					cout << " ";
+				}
+				GotoXY(INDENT_SIDE / 2 + WIDTH / 2, INDENT_TOP + HEIGHT + 1);
+				cout << "MAP2                ";
+				//DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+				//break;
 			}
 			else if (currentItem == 2)
 			{
+				MapUpload = true;
 				DeleteArray();
 				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
-				DrawBorder();
-				LoadFromFile(MAP3);
+				//DrawBorder();
+				LoadFromFile(MAP_HELP3);
 				DrawMap(block, rope, lader, prize);
-				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
-				break;
-			}
-			else if (currentItem == 3)
-			{
-				DeleteArray();
-				getFilesFromDir();
-				string *str = new string;
-				string *tmpStr = new string;
-				*str += "UserMaps/";
-				cout << "\n\n   Write map name\n\n\n   ";
-				cin >> *tmpStr;
-				*str += *tmpStr;
-				LoadFromFile(*str);
-				DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
-				DrawBorder();
-				DrawMap(block, rope, lader, prize);
-				DrawSpace(0, INDENT_SIDE - 2, 0, 50);
-				break;
+				for (int i = 0; i < 5; i++)
+				{
+					for (int j = 0; j < 2; j++)
+					{
+						GotoXY(WIDTH - 1 + j, HEIGHT - 2 + i);
+						SetColor(Black, White);
+						cout << FULL_SIZE_BLOCK;
+					}
+				}
+				for (int i = 0; i < COUNT_OF_PRIZE; i++)
+				{
+					GotoXY(WIDTH + i + 1, INDENT_TOP + 2);
+					cout << " ";
+				}
+				GotoXY(INDENT_SIDE / 2 + WIDTH / 2, INDENT_TOP + HEIGHT + 1);
+				cout << "MAP3               ";
+				//DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+				//break;
 			}
 		}
 		SetColor(White, Black);
@@ -1805,5 +1860,56 @@ void Load()
 		SetConsoleCursorPosition(h, position);
 		cout << SecondMenuItem[currentItem];
 	}
+}
+
+void Create()
+{
+	DeleteArray();
+	DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+	//DrawBorder();
+	GotoXY(MENU_INDENT, INDENT_TOP + 1);
+	cout << "Write map name" << endl;
+	ShowCursor(true);
+	string *name = new string;
+	GotoXY(MENU_INDENT, INDENT_TOP + 2);
+	cin >> *name;
+	ShowCursor(false);
+	GotoXY(INDENT_SIDE / 2 + WIDTH / 2, INDENT_TOP + HEIGHT + 1);
+	cout << *name <<"        ";
+	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+	DrawBorder();
+	CreateMap();
+	WriteToFile(*name);
+	delete name;
+	
+}
+
+void Load()
+{
+	DeleteArray();
+	DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+	GotoXY(0, INDENT_TOP);
+	getFilesFromDir();
+	string *str = new string;
+	string *tmpStr = new string;
+	*str += "UserMaps/";
+	cout << "\n\n   Write map name\n\n\n   ";
+	cin >> *tmpStr;
+	*str += *tmpStr;
+	LoadFromFile(*str);
+	DrawSpace(INDENT_SIDE + 2, WIDTH - INDENT_SIDE - 3, INDENT_TOP + 1, HEIGHT - 2);
+	DrawBorder();
+	DrawMap(block, rope, lader, prize);
+	DrawSpace(0, INDENT_SIDE - 2, 0, 50);
+	if (MapUpload == true)
+	{
+		GotoXY(INDENT_SIDE / 2 + WIDTH / 2, INDENT_TOP + HEIGHT + 1);
+		cout << *tmpStr << "            ";
+	}
+	delete str, tmpStr;
+	str = nullptr;
+	tmpStr = nullptr;
 }
 
