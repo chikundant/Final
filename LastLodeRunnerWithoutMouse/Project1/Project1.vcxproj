@@ -129,6 +129,9 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="WindowSettings.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\Дима\Desktop\icon.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

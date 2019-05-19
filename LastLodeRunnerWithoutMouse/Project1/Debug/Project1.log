@@ -1,5 +1,2 @@
-﻿  FirstMap.cpp
-d:\дз\proga\lastloderunnerwithoutmouse\project1\firstmap.cpp(37): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
-d:\дз\proga\lastloderunnerwithoutmouse\project1\firstmap.cpp(172): warning C4244: '=': conversion from 'wint_t' to 'char', possible loss of data
-d:\дз\proga\lastloderunnerwithoutmouse\project1\firstmap.cpp(1727): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+﻿  Sound.cpp
   Project1.vcxproj -> D:\ДЗ\Proga\LastLodeRunnerWithoutMouse\Debug\LodeRunner.exe

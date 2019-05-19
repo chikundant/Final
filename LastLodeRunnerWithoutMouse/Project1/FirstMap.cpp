@@ -11,6 +11,7 @@ Sprites prize[COUNT_OF_PRIZE];
 Sprites enemy[COUNT_OF_ENEMY];
 
 bool MapUpload = false;
+bool enemyControl = true;
  string MAP1 = "DefaultMaps/Map1";
  string MAP2 = "DefaultMaps/Map2";
  string MAP3 = "DefaultMaps/Map3";
@@ -419,7 +420,17 @@ void MapCreator(Sprites arr[], const int countSign, const int width, const int h
 				arr[countSign - i].x = tmpX;
 				arr[countSign - i].y = tmpY;
 				i -= 1;
-				tmpX = (WIDTH - 1) + (WIDTH - 4 - tmpX - width * 2);
+				if (sprite == LADER)
+				{
+					tmpX = (WIDTH - 5) + (WIDTH - 4 - tmpX - width * 2);
+				}
+				else if(sprite == FULL_SIZE_BLOCK && (tmpX == WIDTH - 6 || tmpX == WIDTH - 5) )
+					tmpX = (WIDTH - 4);
+				else if(sprite == ROPE)
+					tmpX = (WIDTH +1 ) + (WIDTH - 4 - tmpX - width * 2);
+				else 
+					tmpX = (WIDTH - 1) + (WIDTH - 4 - tmpX - width * 2);
+
 				for (int i = 0; i < height; i++)
 				{
 					for (int j = 0; j < width; j++)
@@ -555,6 +566,12 @@ void ChangePos(string look, int* x, int* y, int width, int xChanges, int yChange
 		GotoXY(*x + j, *y);
 		cout << " ";
 	}
+	if (enemyControl == true)
+	{
+		SetColor(Red, White);
+	}
+	else
+		SetColor(Black, White);
 	*x += xChanges;
 	*y += yChanges;
 	GotoXY(*x, *y);
@@ -568,16 +585,30 @@ void ChangePos(string look, char spriteToChange, int *x, int *y, int width, int 
 		GotoXY(*x + j, *y);
 		cout << " ";
 	}
+	if (enemyControl == true)
+	{
+		SetColor(Red, White);
+	}
+	else
+		SetColor(Black, White);
 	for (int j = 0; j < width; j++)
 	{
 		GotoXY(*x + j, *y);
+		SetColor(Black, White);
 		cout << spriteToChange;
 	}
 	*x += xChanges;
 	*y += yChanges;
 	GotoXY(*x , *y);
-	cout << look;
-
+	if (enemyControl == true)
+	{
+		SetColor(Red, White);
+		cout << look;
+	}
+	else {
+		SetColor(Black, White);
+		cout << look;
+	}
 }
 
 void ChangePos(const int countSign, const char sprite, int* x, int* y, int width, int height ,int xChanges, int yChanges)
@@ -592,6 +623,12 @@ void ChangePos(const int countSign, const char sprite, int* x, int* y, int width
 			cout << " ";
 		}
 	}
+	if (enemyControl == true)
+	{
+		SetColor(Red, White);
+	}
+	else
+		SetColor(Black, White);
 	*x += xChanges;
 	*y += yChanges;
 	GotoXY(*x, *y);
@@ -620,6 +657,13 @@ void ChangePos(const int countSign, const char spriteToChange ,const char sprite
 		}
 	}
 	GotoXY(*x, *y);
+	if (enemyControl == true)
+	{
+		SetColor(Red, White);
+	}
+	else
+		SetColor(Black, White);
+
 	for (int i = 0; i < height; i++)
 	{
 		for (int j = 0; j < width; j++)
@@ -878,31 +922,15 @@ void DrawMap(Sprites block[], Sprites rope[], Sprites lader[], Sprites prize[])
 				if (prize[i].x != 0)
 				{
 					GotoXY(prize[i].x + k, prize[i].y + j);
+					SetColor(Red, White);
 					cout << PRIZE;
+					SetColor(Black, White);
 				}
 			}
 		}
 	}
 }
 
-/*
-bool EnemyCollision() // left collision
-{
-	for (int j = 0; j < COUNT_OF_ENEMY; j++)
-	{
-		int tmp = enemy[j].x;
-
-		for (int i = 0; i < COUNT_OF_ENEMY; i++)
-		{
-			if (tmp == enemy[i].x - 2 && j != i)
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-*/
 /*bool EnemyCollision(char) // right collision
 {
 	for (int j = 0; j < COUNT_OF_ENEMY; j++)
@@ -1079,6 +1107,7 @@ void DeleteArray()
 
 void EnemyMove(Sprites hero, char *enemyPosition, char *heroPosition)
 {
+	enemyControl = true;
 	int moveCount = 0;
 	bool touchLeftBorder = false;
 	bool touchRightBorder = true;
@@ -1090,17 +1119,18 @@ void EnemyMove(Sprites hero, char *enemyPosition, char *heroPosition)
 			if (prize[i].x != 0 && prize[i].y != 0)
 			{
 				GotoXY(prize[i].x, prize[i].y);
+				SetColor(Red, White);
 				cout << PRIZE;
-
 			}
 		}
 		moveCount = 0;
-		SetColor(Black, White);
 		if (enemy[i].x == hero.x)
 		{
 			enemy[i].sameXPos = true;
 		}
 		enemy[i].yChanges = false;
+
+
 		// up
 	
 		if (enemy[i].y > hero.y && enemy[i].y > INDENT_TOP + 5 )
@@ -1302,6 +1332,7 @@ void EnemyMove(Sprites hero, char *enemyPosition, char *heroPosition)
 	 EnemyFall:
 		while (((!FloorCollision(enemy[i].look.width, 1, enemy[i].x - enemy[i].look.width, enemy[i].y + 1) && *enemyPosition == 'r') || ((!FloorCollision(enemy[i].look.width, 1, enemy[i].x - 1, enemy[i].y + 1) && *enemyPosition == 'l'))) && enemy[i].y < HEIGHT + INDENT_TOP - 2)
 		{
+
 			if (((PrizeCollision(enemy[i].x, enemy[i].y) || PrizeCollision(enemy[i].x + 1, enemy[i].y)) && *enemyPosition == 'r') || (PrizeCollision(enemy[i].x, enemy[i].y) || PrizeCollision(enemy[i].x - 1, enemy[i].y)) && *enemyPosition == 'l')
 			{
 				//change position
@@ -1309,18 +1340,24 @@ void EnemyMove(Sprites hero, char *enemyPosition, char *heroPosition)
 			if ((RopeCollision(enemy[i].look.width, 1, enemy[i].x - 2, enemy[i].y - 1) && *enemyPosition == 'r') || (RopeCollision(enemy[i].look.width, 1, enemy[i].x - 1, enemy[i].y - 1) && *enemyPosition == 'l'))
 			{
 				if (RopeCollision(enemy[i].look.width, 1, enemy[i].x - 2, enemy[i].y - 1) && !RopeCollision(enemy[i].look.width, 1, enemy[i].x + 1, enemy[i].y - 1) && *enemyPosition == 'r')
-				{
+				{	
+					SetColor(Black, White);
+					//SetColor(Black, White);
 					GotoXY(enemy[i].x - 1, enemy[i].y - 1);
 					cout << "_";
 					break;
 				}
 				else if (RopeCollision(enemy[i].look.width, 1, enemy[i].x - 1, enemy[i].y - 1) && !RopeCollision(enemy[i].look.width, 1, enemy[i].x - 2, enemy[i].y - 1) && * enemyPosition == 'l')
 				{
+					SetColor(Black, White);
+					//SetColor(Red, White);
 					GotoXY(enemy[i].x + 1, enemy[i].y - 1);
 					cout << "_";
 					break;
 				}
 				else {
+					SetColor(Black, White);
+					//SetColor(Red, White);
 					GotoXY(enemy[i].x, enemy[i].y - 1);
 					cout << "_";
 					GotoXY(enemy[i].x + 1, enemy[i].y - 1);
@@ -1462,6 +1499,7 @@ void Move()
 			}
 		}
 		if (_kbhit()) {
+			enemyControl = false;
 			*input = _getch();
 			SetColor(Black, White);
 			if (((PrizeCollision(hero.x, hero.y) || PrizeCollision(hero.x + 1, hero.y)) && *position == 'r') || (PrizeCollision(hero.x, hero.y) || PrizeCollision(hero.x - 1, hero.y)) && *position == 'l')
@@ -1691,6 +1729,7 @@ void Move()
 			}
 		}
 		else {
+			SetColor(Red, White);
 			//Sleep(130);
 			if (*skipCount == ENEMY_SPEED)
 			{

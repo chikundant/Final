@@ -10,7 +10,7 @@ const int MENU_INDENT = INDENT_SIDE/2 - 4;
 const int COUNT_OF_LADERS = 200;
 const int COUNT_OF_BLOCKS = 300;
 const int COUNT_OF_ROPES = 300;
-const int COUNT_OF_PRIZE = 10;
+const int COUNT_OF_PRIZE = 20;
 const int COUNT_OF_ENEMY = 3;
 
 const int BLOCK_WIDTH = 3;
@@ -39,4 +39,4 @@ const char UP = 72;
 const char SPACE = 32;
 
 //game settings
-const int ENEMY_SPEED = 7000;
+const int ENEMY_SPEED = 5000;
